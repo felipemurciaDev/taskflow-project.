@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>task board</title>
+    
+    <style>
+        :root {
+            --primary-color: #2e02dfe1;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #525252;
+            --sidebar-text: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            
+            --font-family: 'Segoe UI', system-ui, sans-serif;
+            
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            text-align: center;
+        }
+        .layout-container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+        aside {
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            width: 250px;
+            padding: var(--spacing-lg);
+        }
+
+        aside ul {
+            list-style: none;
+            margin-top: var(--spacing-md);
+        }
+
+        aside li {
+            padding: var(--spacing-sm) 0;
+            cursor: pointer;
+            border-bottom: 1px solid #0a0b15;
+        }
+
+        main {
+            flex: 1;
+            padding: var(--spacing-lg);
+        }
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        .task-card {
+            background-color: var(--card-bg);
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;            
+            
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(225, 172, 172, 0.1);
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .task-title {
+            font-size: 1.1rem;
+            color: #0f172a;
+        }
+
+        .task-category {
+            font-size: 0.85rem;
+            color: #171dd5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .high-priority { background-color: #ef4444; }
+        .medium-priority { background-color: #eab308; color: #451a03; }
+
+        @media (max-width: 768px) {
+            .layout-container {
+                flex-direction: column;
+            }
+
+            aside {
+                width: 100%;
+                padding: var(--spacing-md);
+            }
+
+            .task-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Mi Gestor de Tareas</h1>
+    </header>
+
+    <div class="layout-container">
+        
+        <aside>
+            <h2>Menú</h2>
+            <nav>
+                <ul>
+                    <li>Todas las tareas</li>
+                    <li>Completadas</li>
+                    <li>Pendientes</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>
+            <section class="task-list">
+                
+                <div class="task-card">
+                    <div class="task-info">
+                        <h3 class="task-title">Comprar víveres para la semana</h3>
+                        <span class="task-category">Hogar</span>
+                    </div>
+                    <span class="badge high-priority">Alta</span>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-info">
+                        <h3 class="task-title">Finalizar reporte del mes</h3>
+                        <span class="task-category">Trabajo</span>
+                    </div>
+                    <span class="badge medium-priority">Media</span>
+                </div>
+
+            </section>
+        </main>
+        
+    </div>
+</body>
+</html>
