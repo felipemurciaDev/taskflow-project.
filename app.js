@@ -1,131 +1,88 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const formulario = document.getElementById('mi Gestor de tareas');
-    const entradaTarea = document.getElementById('entrada-tarea');
-    const listaTareas = document.getElementById('lista-tareas');
-    
-    const btnTodas = document.getElementById('btn-todas');
-    const btnPendientes = document.getElementById('btn-pendientes');
-    const btnCompletadas = document.getElementById('btn-completadas');
-    
-    const btnDarkMode = document.getElementById('btn-dark-mode');
+const lista = document.getElementById("lista-tareas");
+const input = document.getElementById("input-tarea");
+const form = document.getElementById("form-tarea");
+const filtros = document.querySelectorAll(".filtro");
+const btnDark = document.getElementById("btn-dark");
 
-    btnDarkMode.addEventListener('click', () => {
+let tareas = [];
 
-        document.documentElement.classList.toggle('dark');
-        
-        if (document.documentElement.classList.contains('dark')) {
-            btnDarkMode.textContent = '☀️ Modo Claro';
-        } else {
-            btnDarkMode.textContent = '🌙 Modo Oscuro';
-        }
-    });
+function animar(elemento) {
+    elemento.classList.add("opacity-0", "translate-y-2");
+    setTimeout(() => {
+        elemento.classList.remove("opacity-0", "translate-y-2");
+    }, 10);
+}
 
-    let arrayTareas = [];
-    cargarDesdeLocalStorage();
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-    function guardarEnLocalStorage() {
-        localStorage.setItem('misTareas', JSON.stringify(arrayTareas));
+    if (input.value.trim() === "") return;
+
+    const nueva = {
+        id: Date.now(),
+        texto: input.value,
+        completada: false
+    };
+
+    tareas.push(nueva);
+    input.value = "";
+    render();
+});
+
+function render(filtro = "todas") {
+    lista.innerHTML = "";
+
+    let filtradas = tareas;
+
+    if (filtro === "completadas") {
+        filtradas = tareas.filter(t => t.completada);
+    } else if (filtro === "pendientes") {
+        filtradas = tareas.filter(t => !t.completada);
     }
 
-    function cargarDesdeLocalStorage() {
-        const tareasGuardadas = localStorage.getItem('misTareas');
-        if (tareasGuardadas) {
-            arrayTareas = JSON.parse(tareasGuardadas);
-            renderizarTareas();
-        }
-    }
+    filtradas.forEach(t => {
+        const div = document.createElement("div");
 
-    function renderizarTareas() {
-        listaTareas.innerHTML = ''; 
-        
-        arrayTareas.forEach((tarea) => {
-            const estadoTexto = tarea.completada ? 'Completado' : 'Por hacer';
-            const claseCompletada = tarea.completada ? 'opacity-60 completada' : '';
-            const checkeado = tarea.completada ? 'checked' : '';
-            const textoTachado = tarea.completada ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-slate-100';
+        div.className = `
+            tarea flex items-center justify-between p-4 rounded-lg
+            bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+            transition hover:shadow-sm
+        `;
 
-            const tareaHTML = `
-                <div class="task-card flex flex-col sm:flex-row justify-between sm:items-center bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-1 transition duration-300
-                 ${claseCompletada}" data-id="${tarea.id}">
-                    <div class="flex flex-col gap-1 mb-3 sm:mb-0">
-                        <h3 class="text-lg font-semibold task-title ${textoTachado}">${tarea.texto}</h3>
-                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">General</span>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
-                            <span class="estado-texto">${estadoTexto}</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer toggle-estado" ${checkeado}>
-                                <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-['']
-                                 after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300
-                                 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600"></div>
-                            </label>
-                        </div>
-                        <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded text-sm transition">Eliminar</button>
-                    </div>
-                </div>
-            `;
-            listaTareas.insertAdjacentHTML('beforeend', tareaHTML);
+        div.innerHTML = `
+            <div class="flex items-center gap-3">
+                <input type="checkbox" class="w-5 h-5" ${t.completada ? "checked" : ""}>
+                <span class="${t.completada ? "line-through text-slate-500" : ""}">
+                    ${t.texto}
+                </span>
+            </div>
+
+            <button class="text-red-500 hover:text-red-700 transition">✖</button>
+        `;
+
+        div.querySelector("input").addEventListener("change", () => {
+            t.completada = !t.completada;
+            render(filtro);
         });
-    }
 
-    formulario.addEventListener('submit', (event) => {
-        event.preventDefault(); 
-        const textoTarea = entradaTarea.value.trim();
-        if (textoTarea === '') return; 
-
-        const nuevaTarea = {
-            id: Date.now(),
-            texto: textoTarea,
-            completada: false
-        };
-        
-        arrayTareas.push(nuevaTarea);
-        guardarEnLocalStorage(); 
-        renderizarTareas(); 
-        entradaTarea.value = ''; 
-    });
-
-    listaTareas.addEventListener('click', (event) => {
-        if (event.target.classList.contains('btn-eliminar')) {
-            const card = event.target.closest('.task-card');
-            const idTarea = parseInt(card.getAttribute('data-id'));
-            arrayTareas = arrayTareas.filter(tarea => tarea.id !== idTarea);
-            guardarEnLocalStorage(); 
-            renderizarTareas(); 
-        }
-    });
-
-    listaTareas.addEventListener('change', (event) => {
-        if (event.target.classList.contains('toggle-estado')) {
-            const card = event.target.closest('.task-card');
-            const idTarea = parseInt(card.getAttribute('data-id'));
-            const tareaModificar = arrayTareas.find(tarea => tarea.id === idTarea);
-            if (tareaModificar) {
-                tareaModificar.completada = event.target.checked;
-                guardarEnLocalStorage(); 
-                renderizarTareas(); 
-            }
-        }
-    });
-
-    function filtrarTareas(filtro) {
-        const tareasDOM = listaTareas.querySelectorAll('.task-card');
-        
-        tareasDOM.forEach(tarea => {
-            const estaCompletada = tarea.classList.contains('completada');
-            tarea.classList.remove('hidden'); 
-
-            if (filtro === 'pendientes' && estaCompletada) {
-                tarea.classList.add('hidden');
-            } 
-            else if (filtro === 'completadas' && !estaCompletada) {
-                tarea.classList.add('hidden');
-            }
+        div.querySelector("button").addEventListener("click", () => {
+            tareas = tareas.filter(x => x.id !== t.id);
+            render(filtro);
         });
-    }
 
-    if (btnTodas) btnTodas.addEventListener('click', () => filtrarTareas('todas'));
-    if (btnPendientes) btnPendientes.addEventListener('click', () => filtrarTareas('pendientes'));
-    if (btnCompletadas) btnCompletadas.addEventListener('click', () => filtrarTareas('completadas'));
+        animar(div);
+        lista.appendChild(div);
+    });
+}
+
+filtros.forEach(f => {
+    f.addEventListener("click", () => {
+        filtros.forEach(x => x.classList.remove("bg-slate-200", "dark:bg-slate-700"));
+        f.classList.add("bg-slate-200", "dark:bg-slate-700");
+        render(f.dataset.filter);
+    });
+});
+
+btnDark.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
 });
