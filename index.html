@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Tareas Retro</title>
+    <title>Tareas.exe - Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -16,164 +15,43 @@
                         'retro-dark': '4px 4px 0px 0px rgba(255,255,255,1)',
                     },
                     colors: {
-                        retro: {
-                            yellow: '#FDE047',
-                            pink: '#F472B6',
-                            green: '#4ADE80',
-                            blue: '#60A5FA',
-                            darkBg: '#111827',
-                            darkCard: '#1F2937'
-                        }
+                        retro: { yellow: '#FDE047', pink: '#F472B6', green: '#4ADE80', blue: '#60A5FA', darkBg: '#111827', darkCard: '#1F2937' }
                     }
                 }
             }
         }
     </script>
-
     <style>
-        .task-enter {
-            animation: slideIn 0.3s ease-out forwards;
-        }
-        .task-exit {
-            animation: slideOut 0.3s ease-in forwards;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideOut {
-            from { opacity: 1; transform: translateX(30px); }
-            to { opacity: 0; transform: translateX(30px); }
-        }
-
-        .btn-retro:active {
-            transform: translate(4px, 4px);
-            box-shadow: 0px 0px 0px 0px rgba(0,0,0,1) !important;
-        }
-        .dark .btn-retro:active {
-            box-shadow: 0px 0px 0px 0px rgb(246, 245, 245) !important;
-        }
-        
-        body { transition: background-color 0.3s ease, color 0.3s ease; }
+        .task-enter { animation: slideIn 0.2s ease-out forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-retro:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px 0px black !important; }
+        body { transition: background-color 0.3s ease; font-family: monospace; }
+        [contenteditable]:focus { background: #FDE047; color: black; outline: none; padding: 0 4px; }
     </style>
 </head>
-
-<body class="bg-retro-yellow dark:bg-retro-darkBg text-gray-900 dark:text-white min-h-screen p-6 md:p-12 font-mono">
-
-    <main class="max-w-lg mx-auto bg-white dark:bg-retro-darkCard border-4 border-black dark:border-white shadow-retro dark:shadow-retro-dark p-6">
-        
-        <header class="flex justify-between items-center mb-8 border-b-4 border-black dark:border-white pb-4">
-            <h1 class="text-3xl font-black tracking-tighter uppercase">Tareas.exe</h1>
-            <button id="themeToggle" class="btn-retro border-4 border-black dark:border-white p-2 bg-retro-blue dark:bg-indigo-600 shadow-retro dark:shadow-retro-dark cursor-pointer transition-all">
-                <span id="themeIcon" class="text-xl">🌙</span>
-            </button>
+<body class="bg-retro-yellow dark:bg-retro-darkBg text-gray-900 dark:text-white min-h-screen p-4 md:p-10">
+    <main class="max-w-xl mx-auto bg-white dark:bg-retro-darkCard border-4 border-black dark:border-white shadow-retro dark:shadow-retro-dark p-6">
+        <header class="flex justify-between items-center mb-6 border-b-4 border-black dark:border-white pb-4">
+            <h1 class="text-2xl font-black uppercase tracking-tighter">Tareas.exe</h1>
+            <button id="btn-dark" class="btn-retro border-4 border-black dark:border-white p-2 bg-retro-blue shadow-retro dark:shadow-retro-dark">🌙</button>
         </header>
 
-        <form id="taskForm" class="flex gap-3 mb-8">
-            <input 
-                type="text" 
-                id="taskInput" 
-                placeholder="Ingresa una tarea..." 
-                class="flex-1 border-4 border-black dark:border-white p-3 focus:outline-none dark:bg-gray-700 dark:text-white shadow-[inset_3px_3px_0px_rgba(0,0,0,0.1)] placeholder-gray-500 dark:placeholder-gray-400"
-                required
-            >
-            <button type="submit" class="btn-retro bg-retro-pink dark:bg-pink-600 border-4 border-black dark:border-white px-5 py-3 font-bold uppercase shadow-retro dark:shadow-retro-dark cursor-pointer transition-all">
-                Add
-            </button>
+        <form id="form-tarea" class="flex gap-2 mb-4">
+            <input type="text" id="input-tarea" placeholder="Nueva tarea..." class="flex-1 border-4 border-black dark:border-white p-2 dark:bg-gray-700 outline-none shadow-[inset_3px_3px_0px_rgba(0,0,0,0.1)]">
+            <button type="submit" class="btn-retro bg-retro-pink border-4 border-black dark:border-white px-4 font-bold shadow-retro dark:shadow-retro-dark">+</button>
         </form>
 
-        <ul id="taskList" class="space-y-4 overflow-hidden">
-            </ul>
+        <div class="flex flex-wrap gap-2 mb-6 text-xs font-bold">
+            <input type="text" id="input-busqueda" placeholder="Buscar..." class="flex-1 border-2 border-black dark:border-white p-1 px-2 dark:bg-gray-800 outline-none">
+            <div class="flex border-2 border-black dark:border-white overflow-hidden">
+                <button class="filtro px-2 py-1 bg-retro-green border-r-2 border-black dark:border-white text-black" data-filter="todas">ALL</button>
+                <button class="filtro px-2 py-1 bg-white dark:bg-gray-800 border-r-2 border-black dark:border-white" data-filter="pendientes">TODO</button>
+                <button class="filtro px-2 py-1 bg-white dark:bg-gray-800" data-filter="completadas">DONE</button>
+            </div>
+            <button id="btn-orden" class="border-2 border-black dark:border-white px-2 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">A-Z ↑</button>
+        </div>
+        <div id="lista-tareas" class="space-y-3"></div>
     </main>
-
-    <script>
-
-        const taskForm = document.getElementById('taskForm');
-        const taskInput = document.getElementById('taskInput');
-        const taskList = document.getElementById('taskList');
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const htmlElement = document.documentElement;
-
-        let tasks = [];
-
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                htmlElement.classList.add('dark');
-                themeIcon.textContent = '☀️';
-            }
-        }
-
-        themeToggle.addEventListener('click', () => {
-            htmlElement.classList.toggle('dark');
-            const isDark = htmlElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            themeIcon.textContent = isDark ? '☀️' : '🌙';
-        });
-
-        function renderTasks() {
-            taskList.innerHTML = ''; 
-
-            tasks.forEach((task, index) => {
-                const li = document.createElement('li');
-                const bgColor = index % 2 === 0 ? 'bg-retro-green dark:bg-green-700' : 'bg-white dark:bg-gray-600';
-                
-                li.className = `flex justify-between items-center ${bgColor} border-4 border-black dark:border-white p-4 shadow-retro dark:shadow-retro-dark task-enter`;
-                
-                const textStyle = task.completed ? 'line-through opacity-50' : '';
-
-                li.innerHTML = `
-                    <label class="flex items-center gap-4 cursor-pointer flex-1">
-                        <input type="checkbox" class="w-6 h-6 border-4 border-black appearance-none checked:bg-black dark:checked:bg-white transition-colors" 
-                               ${task.completed ? 'checked' : ''} 
-                               onchange="toggleTask(${index})">
-                        <span class="font-bold text-lg ${textStyle} break-all">${task.text}</span>
-                    </label>
-                    <button onclick="deleteTask(${index}, this)" class="btn-retro bg-red-400 dark:bg-red-500 border-4 border-black dark:border-white ml-4 px-3 py-1 text-black font-black shadow-retro dark:shadow-retro-dark cursor-pointer transition-all">
-                        X
-                    </button>
-                `;
-                taskList.appendChild(li);
-            });
-        }
-
-        taskForm.addEventListener('submit', (e) => {
-            e.preventDefault(); 
-            const text = taskInput.value.trim();
-            
-            if (text) {
-                tasks.push({ text, completed: false });
-                taskInput.value = '';
-                renderTasks();
-            }
-        });
-
-        window.toggleTask = (index) => {
-            tasks[index].completed = !tasks[index].completed;
-            renderTasks();
-        };
-
-        window.deleteTask = (index, buttonElement) => {
-            const li = buttonElement.closest('li');
-            
-            li.classList.remove('task-enter');
-            li.classList.add('task-exit');
-
-   
-            li.addEventListener('animationend', () => {
-                tasks.splice(index, 1);
-                renderTasks();
-            });
-        };
-
-      
-        initTheme();
-        renderTasks();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
